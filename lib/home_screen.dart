@@ -1,11 +1,8 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-
 import 'package:http/http.dart' as http;
-
-import 'package:task_one/AssociatedDrug.dart';
+import 'package:task_one/Problems.dart';
 
 class HomeScreen extends StatefulWidget {
   final String name, email;
@@ -20,23 +17,20 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  @override
-  void initState() {
-    getAllProblem();
-    super.initState();
-  }
+  Future<List<Problems>> getData() async {
+    List<Problems> list;
+    String link =
+        "https://run.mocky.io/v3/5c648026-c95a-4cf8-9a14-79f13cfb29d3";
+    var res = await http.get(Uri.parse(link));
+    print(res.body);
 
-  Future<List<AssociatedDrug>> getAllProblem() async {
-    List<AssociatedDrug> problemList = [];
-    var apiURl = 'https://run.mocky.io/v3/5c648026-c95a-4cf8-9a14-79f13cfb29d3';
-    var response = await http.get(Uri.parse(apiURl));
-    if (response.statusCode == 200) {
-      var data = await jsonDecode(response.body.toString());
-      problemList = data.map((problems) => AssociatedDrug.fromJson(problems));
+    var data = json.decode(res.body);
+    var rest = data["problems"] as List;
+    print(rest);
+    list = rest.map<Problems>((json) => Problems.fromMap(json)).toList();
+    print("List Size : ${list.length}");
 
-      print(problemList);
-    }
-    return problemList;
+    return list;
   }
 
   @override
@@ -44,8 +38,9 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       body: Center(
         child: Container(
+          padding: EdgeInsets.all(30),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Text(
                 'Welcome',
@@ -78,3 +73,29 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
+
+// print(data[0]['Diabetes'][0]['medications'][0]['medicationsClasses'][0]
+//     ['className'][0]['associatedDrug'][0]['name']);
+// print(data[0]['Diabetes'][0]['medications'][0]['medicationsClasses'][0]
+//     ['className'][0]['associatedDrug'][0]['dose']);
+// print(data[0]['Diabetes'][0]['medications'][0]['medicationsClasses'][0]
+//     ['className'][0]['associatedDrug'][0]['strength']);
+
+
+  // getAllProblems() async {
+  //   var apiURl = 'https://run.mocky.io/v3/5c648026-c95a-4cf8-9a14-79f13cfb29d3';
+  //   var response = await http.get(Uri.parse(apiURl));
+  //   if (response.statusCode == 200) {
+  //     Map<String, dynamic> map =
+  //         await jsonDecode(response.body) as Map<String, dynamic>;
+  //     List data = map["problems"];
+  //     print(data[0]['Diabetes'][0]['medications'][0]['medicationsClasses'][0]
+  //         ['className'][0]['associatedDrug'][0]['name']);
+  //   } else {
+  //     throw Exception('error');
+  //   }
+  //   setState(() {
+  //     data;
+  //   });
+  //   return data;
+  // }
